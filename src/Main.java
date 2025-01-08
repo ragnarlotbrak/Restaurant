@@ -1,52 +1,48 @@
-import Project.MenuItem;
-import Project.Order;
-import Project.Restaurant;
+import Project.*;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        Restaurant restaurant1 = new Restaurant("Italian cuisine");
-        Restaurant restaurant2 = new Restaurant("Russian food world");
-        Restaurant restaurant3 = new Restaurant("Kazakh yurt - food");
 
-        restaurant1.addMenuItem(new MenuItem("Pizza_Mozzarella", 2499.99));
-        restaurant1.addMenuItem(new MenuItem("Carbonara_Pasta", 4999.99));
-        restaurant1.addMenuItem(new MenuItem("Cannelloni", 7800.50));
+        Admin admin = new Admin("Admin228");
+        System.out.println("\nWelcome, " + admin);
 
-        restaurant2.addMenuItem(new MenuItem("Borsch", 1499.99));
-        restaurant2.addMenuItem(new MenuItem("Pelmeni", 999.00));
-        restaurant2.addMenuItem(new MenuItem("Schi", 5490.99));
+        ArrayList<Restaurant> restaurants = DataInit.createRestaurants();
 
-        restaurant3.addMenuItem(new MenuItem("Beshbarmaq", 29990.00));
-        restaurant3.addMenuItem(new MenuItem("Syrne", 17000.00));
-        restaurant3.addMenuItem(new MenuItem("Quyrdaq", 5490.50));
+        restaurants.sort(new RestaurantComparator());
+        System.out.println("\nRestaurants:");
+        int j = 1;
+        for (Restaurant restaurant : restaurants) {
+            System.out.println(j + " " + restaurant.getName());
+            j++;
+        }
 
-        System.out.println("\nRestaurants: ");
-        System.out.println("1. " + restaurant1.getName());
-        System.out.println("2. " + restaurant2.getName());
-        System.out.println("3. " + restaurant3.getName());
+        double minPrice = 5000.00;
+        ArrayList<MenuItem> expensiveItems = new ArrayList<>(OrderFilter.filterItemsByPrice(restaurants.get(0), minPrice));
+        System.out.println("\nItems priced above " + minPrice + " tenge:");
+        for (MenuItem item : expensiveItems) {
+            System.out.println(item);
+        }
+
+        admin.manageMenu(restaurants.get(0), new MenuItem("Tiramisu", 4000.00));
+
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("\nRestaurants:");
+        for (int i = 0; i < restaurants.size(); i++) {
+            System.out.println((i + 1) + ". " + restaurants.get(i).getName());
+        }
 
         System.out.print("\nChoose a restaurant you would like to visit (1-3): ");
-        Scanner scanner = new Scanner(System.in);
         int choice = scanner.nextInt();
-        Restaurant selectedRestaurant;
-
-        if (choice == 1) {
-            selectedRestaurant = restaurant1;
-        }
-        else if (choice == 2) {
-            selectedRestaurant = restaurant2;
-        }
-        else if (choice == 3) {
-            selectedRestaurant = restaurant3;
-        }
-        else {
+        if (choice < 1 || choice > restaurants.size()) {
             System.out.println("Invalid choice");
             return;
         }
 
-        System.out.println("\nSelected restautant: " + selectedRestaurant.getName());
+        Restaurant selectedRestaurant = restaurants.get(choice - 1);
+        System.out.println("\nSelected restaurant: " + selectedRestaurant.getName());
         selectedRestaurant.printMenu();
 
         Order order = new Order(1);
